@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data>
+        <record id="kits_mrp_customization_inherit_product_product_search_view" model="ir.ui.view">
+            <field name="name">kits.mrp.customization.inherit.product.product.search.view</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_search_form_view" />
+            <field name="arch" type="xml">
+                <xpath expr="//group[1]" attributes="before">
+                    <filter name="filter_available_multiple_location" string="Available More Than One Location" domain="[('multilocation_available','=',True)]" />
+                </xpath>
+            </field>
+        </record>
+    </data>
+
+</odoo>
