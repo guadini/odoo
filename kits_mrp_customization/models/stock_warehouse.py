@@ -1,4 +1,3 @@
-from cv2 import randShuffle, sepFilter2D
 from odoo import models,fields,api,_
 from odoo.exceptions import UserError
 

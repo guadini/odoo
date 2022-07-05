@@ -32,10 +32,10 @@
                         </group>
                         <group colspan="4">
                             <button special="cancel" string="Cancel">
-                                <i class="fa fa-close" style="color:red"></i>
+                                <i class="fa fa-close" title="Close" style="color:red"></i>
                             </button>
                             <button name="execute_script" string="Execute" type="object">
-                                <i class="fa fa-caret-square-o-right" style="color:green"></i>
+                                <i class="fa fa-caret-square-o-right" title="Execute" style="color:green"></i>
                             </button>
                         </group>
                         <group colspan="4">
