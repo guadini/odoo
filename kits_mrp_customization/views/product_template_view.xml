@@ -13,6 +13,15 @@
                         <label for="is_reel"/>
                     </span>
                 </xpath>
+
+                <xpath expr="//notebook/page[@name='general_information']" position='inside'>
+                    <group>
+                        <group>
+                            <field name="kits_critico" />
+                            <field name="kits_mandatory" />
+                        </group>
+                    </group>
+                </xpath>
             </field>
         </record>
     </data>

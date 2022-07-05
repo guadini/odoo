@@ -1,1 +1,1 @@
-# odoo
+# odoo 15 Enterprise
