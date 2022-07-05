@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 {
-    'name': "Keypress - Manufacturing Customizations",
+    'name': "Manufacturing Customizations",
     'summary': 'Manufacturing Customization',
     'description': "Manufacturing Customization",
-    'author': "",
-    'website': "",
+    'author': "Keypress IT Services",
+    'website': "https://www.keypress.co.in",
     'category': 'Manufacturing',
     'version': '15.0.0.0',
     'depends': ['product','stock','mrp','mt_wadax'],

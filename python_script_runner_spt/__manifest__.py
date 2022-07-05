@@ -3,10 +3,10 @@
     "description": """
     Installing this module, user will able to run python code from Odoo.
 """,
-    "version": "13.0.0.1",
-    'author': 'SnepTech',
+    "version": "15.0.0.1",
+    'author': 'Keypress',
     'license': 'AGPL-3',
-    'website': 'https://www.sneptech.com',
+    'website': 'https://www.keypress.co.in',
     "depends": ['base'],
     "data": [
         'security/ir.model.access.csv',
