@@ -20,6 +20,7 @@
         'views/stock_location_route_view.xml',
         'views/stock_location_orderpoint_view.xml',
         'views/mrp_production_view.xml',
+        'views/stock_quant_view.xml',
     ],
     'application': True,
     'license': 'LGPL-3',
