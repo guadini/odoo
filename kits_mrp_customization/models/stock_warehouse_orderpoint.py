@@ -24,7 +24,7 @@ class stock_warehouse_orderpoint(models.Model):
     @api.depends('product_id','bom_id')
     def _compute_have_bom(self):
         for record in self:
-            record.have_bom = boolean(self.env['mrp.bom'].search([('product_id','=',record.product_id.id)],limit=1))
+            record.have_bom = boolean(self.env['mrp.bom'].search([('product_tmpl_id','=',record.product_id.product_tmpl_id.id)],limit=1))
     
     def cron_auto_create_replanishment(self):
         warehouse_obj = self.env['stock.warehouse'].sudo()
@@ -43,8 +43,9 @@ class stock_warehouse_orderpoint(models.Model):
                         'product_id':product.id,
                         'location_id':location.id,
                         }
-                    if not self.sudo().search([('product_id','=',product.id),('location_id','=',location.id),('active','in',(True,False))],limit=1):
-                        if self.env['mrp.bom'].sudo().search([('product_id','=',product.id)],limit=1):
+                    replenishment_id = self.sudo().search([('product_id','=',product.id),('location_id','=',location.id),('active','in',(True,False))],limit=1)
+                    if not replenishment_id:
+                        if self.env['mrp.bom'].sudo().search([('product_tmpl_id','=',product.product_tmpl_id.id)],limit=1):
                             vals.update({
                                 'route_id':default_manufacture_route.id,
                                 })
@@ -58,7 +59,11 @@ class stock_warehouse_orderpoint(models.Model):
                                     'route_id':default_spfw_route.id,
                                 })
                     else:
-                        continue
+                        # Set warehouse if not set.
+                        replenishment_id._onchange_location_id()
+                        replenishment_id._compute_have_bom() # Check bom each time in existing replenishments.
                     
                     if vals.get('route_id'):
-                        self.sudo().create(vals)
+                        replenishment_id = self.sudo().create(vals)
+                        replenishment_id._onchange_location_id() # Onchange call to set warehouse from location.
+

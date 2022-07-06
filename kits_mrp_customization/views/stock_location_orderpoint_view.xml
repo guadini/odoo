@@ -20,8 +20,8 @@
             <field name="arch" type="xml">
                 <xpath expr="//filter[@name='filter_not_snoozed']" position="after">
                     <separator/>
-                    <filter name="filter_manufacture_products" string="Manufactured Products" domain="[('bom_id', '!=', False)]" />
-                    <filter name="filter_bom_components" string="BOM Components" domain="[('bom_id', '=', False)]" />
+                    <filter name="filter_manufacture_products" string="Manufactured Products" domain="[('have_bom', '=', True)]" />
+                    <filter name="filter_bom_components" string="BOM Components" domain="[('have_bom', '=', False)]" />
                     <filter name="filter_sale_ok" string="Can be Sold" domain="[('product_id.sale_ok', '=', True)]" />
                     <filter name="filter_purchase_ok" string="Can be Purchased" domain="[('product_id.purchase_ok', '=', True)]" />
                     <filter name="filter_reel_strips" string="Reel/Strips Components" domain="[('product_id.is_reel', '=', True)]" />
