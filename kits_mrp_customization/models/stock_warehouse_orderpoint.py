@@ -1,6 +1,5 @@
 from xmlrpc.client import boolean
 from odoo import models,fields,api,_
-from odoo.exceptions import UserError
 
 class stock_warehouse_orderpoint(models.Model):
     _inherit = 'stock.warehouse.orderpoint'
@@ -53,6 +52,9 @@ class stock_warehouse_orderpoint(models.Model):
                             'product_id':product.id,
                             'location_id':location.id,
                             'route_id':route_id.id,
+                            'trigger':'manual',
+                            'product_max_qty':0,
+                            'product_min_qty':0,
                             })
                         replenishment_id._onchange_location_id() # #Onchange call to set warehouse from location.
                     else:
