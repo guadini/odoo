@@ -14,4 +14,4 @@ class product_template(models.Model):
                 record.type = 'product'
                 record.tracking = 'lot'
             else:
-                record.tracking = 'no_tracking'
+                record.tracking = 'none'
