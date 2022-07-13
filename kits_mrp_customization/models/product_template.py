@@ -13,3 +13,5 @@ class product_template(models.Model):
             if record.is_reel:
                 record.type = 'product'
                 record.tracking = 'lot'
+            else:
+                record.tracking = 'no_tracking'

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="kits_mrp_customization.MOMenu" owl="1">
+        <Dropdown class="o_mo_menu btn-group" togglerClass="'btn btn-light'" t-props="dropdownProps" t-on-dropdown-item-selected="onMOBySelected">
+            <t t-set-slot="toggler">
+                <span class="o_dropdown_title">Select MO<t t-if="props.showCaretDown"> <i class="fa fa-caret-down ml-1"/></t></span>
+            </t>
+            <t t-set="currentGroup" t-value="null"/>
+            <t t-foreach="items" t-as="item">
+                <DropdownItem class="o_item_option" t-att-class="{ selected: item.isActive }" payload="{ itemId: item.id}" parentClosingMode="'none'" t-esc="item.name"/>
+            </t>
+        </Dropdown>
+    </t>
+</templates>

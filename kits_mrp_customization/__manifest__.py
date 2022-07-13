@@ -8,7 +8,7 @@
     'website': "https://www.keypress.co.in",
     'category': 'Manufacturing',
     'version': '15.0.0.0',
-    'depends': ['product','stock','mrp','mt_wadax'],
+    'depends': ['base','product','stock','mrp','mt_wadax','web'],
     'data': [
         # data
         'data/ir_cron.xml',
@@ -22,6 +22,16 @@
         'views/mrp_production_view.xml',
         'views/stock_quant_view.xml',
     ],
+    'assets':{
+        'web.assets_backend': [
+            "kits_mrp_customization/static/src/js/momenus.js",
+            "kits_mrp_customization/static/src/js/control_panel.js",
+        ],
+        'web.assets_qweb': [
+            'kits_mrp_customization/static/src/xml/control_panel.xml',
+            'kits_mrp_customization/static/src/xml/momenu.xml',
+        ],
+    },
     'application': True,
     'license': 'LGPL-3',
 }

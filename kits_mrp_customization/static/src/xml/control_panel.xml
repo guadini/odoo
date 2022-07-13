@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="kits_mrp_customization.ControlPanel" t-inherit="web.Legacy.ControlPanel" t-inherit-mode="extension" owl="1">
+        <xpath expr="//div[hasclass('o_control_panel')]/div[hasclass('o_cp_bottom')]/div[hasclass('o_cp_bottom_left')]/div[hasclass('o_cp_buttons')]" position="after">
+            <div class="o_cp_searchview">
+                <MOMenu t-if="props.searchMenuTypes.includes('groupBy')" class="o_group_by_menu" fields="fields" />
+            </div>
+        </xpath>
+    </t>
+</templates>
