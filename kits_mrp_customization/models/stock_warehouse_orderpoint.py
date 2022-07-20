@@ -10,15 +10,13 @@ class stock_warehouse_orderpoint(models.Model):
     kits_on_hand = fields.Float('On Hand',compute="_compute_details",store=True,compute_sudo=True)
 
     allocate_ids = fields.One2many('kits.reel.allocate','replenishment_id','#Lot Allocate')
-    qty_satisfied = fields.Boolean('Total Allocated',compute="_compute_total",store=True,compute_sudo=True)
+    qty_satisfied = fields.Boolean('Total Allocated',compute="_compute_total")
 
-    @api.depends('allocate_ids','allocate_ids.allocate_line_ids','allocate_ids.alternative_line_ids')
+    @api.depends('allocate_ids','allocate_ids.total_needed','allocate_ids.total_allocated')
     def _compute_total(self):
         for record in self:
-            total_needed = sum(record.allocate_ids.allocate_line_ids.mapped('qty_needed'))
-            total_needed += sum(record.allocate_ids.alternative_line_ids.mapped('qty_needed'))
-            total_allocated = sum(record.allocate_ids.allocate_line_ids.mapped('qty_allocated'))
-            total_allocated += sum(record.allocate_ids.alternative_line_ids.mapped('qty_allocated'))
+            total_needed = sum(record.allocate_ids.mapped('total_needed'))
+            total_allocated = sum(record.allocate_ids.mapped('total_allocated'))
             record.qty_satisfied = True if total_allocated and (total_needed <= total_allocated) else False
 
     @api.depends('product_id','product_id.mt_product_alternative_ids','product_id.seller_ids','location_id')
@@ -110,7 +108,7 @@ class stock_warehouse_orderpoint(models.Model):
 
             move_ids = self.env['stock.move'].search([('raw_material_production_id','!=',False),('product_id.is_reel','=',True),('location_id','=',record.location_id.id),('raw_material_production_id.state','=','confirmed')])
             # move_ids = move_ids.filtered(lambda x: x.product_uom_qty > x.quantity_done or x.state == 'assigned') # Remove assigned moves.
-            move_ids = move_ids.filtered(lambda x: x.product_uom_qty > x.reserved_availability) # Remove assigned moves.
+            move_ids = move_ids.filtered(lambda x: x.product_uom_qty > x.quantity_done) # Remove assigned moves.
 
             allocate_id = reel_allocate_obj.search([('replenishment_id','=',record.id)],limit=1)
             if not allocate_id:
@@ -128,7 +126,7 @@ class stock_warehouse_orderpoint(models.Model):
                 if move_id.move_line_ids and move_id.product_qty <= move_id.reserved_availability:
                     move_ids -= move_id
                 else:
-                    qty_needed = sum(move_ids.mapped('product_qty'))
+                    qty_needed = move_id.product_qty - move_id.reserved_availability
                     qty_allocated = 0
 
                     if stock_quant_ids:
@@ -150,16 +148,6 @@ class stock_warehouse_orderpoint(models.Model):
                                             allocated_quant_ids |= quant_id
                                             qty_allocated += qty_needed
 
-                                    for quant in wa_stock_ids.sorted(lambda x: x.quantity):
-                                        if (qty_allocated <= qty_needed):
-                                            vals = _get_allocation_vals(allocate_id,record.product_id,quant,move_id)
-                                            if vals:
-                                                allocate_lines.append(vals)
-                                                allocated_quant_ids |= quant
-                                                qty_allocated += quant.quantity
-                                        elif qty_allocated >= qty_needed:
-                                            break
-
                             # Exact Matching Lot at INS/MON location.
                             exact_match_ids = (stock_quant_ids - wa_stock_ids).filtered(lambda x: x.quantity == (qty_needed-qty_allocated) and x not in allocated_quant_ids)
                             if (qty_allocated < qty_needed) and len(exact_match_ids):
@@ -169,6 +157,16 @@ class stock_warehouse_orderpoint(models.Model):
                                     allocated_quant_ids |= exact_match_ids[0]
                                     qty_allocated += exact_match_ids[0].quantity
 
+                            for quant in wa_stock_ids.sorted(lambda x: x.quantity):
+                                if (qty_allocated < qty_needed):
+                                    vals = _get_allocation_vals(allocate_id,record.product_id,quant,move_id)
+                                    if vals:
+                                        allocate_lines.append(vals)
+                                        allocated_quant_ids |= quant
+                                        qty_allocated += quant.quantity
+                                elif qty_allocated >= qty_needed:
+                                    break
+                        
                         elif len(locations) == 1:
                             # Check Need and allocate
                             if qty_allocated < qty_needed:

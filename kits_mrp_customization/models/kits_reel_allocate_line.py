@@ -58,7 +58,7 @@ class kits_reel_allocate_line(models.Model):
         #         'company_id':res.component_line_id.company_id.id,
         #         'date':fields.Datetime.now(),
         #         'location_dest_id':res.component_line_id.location_dest_id.id,
-        #         'location_id':res.component_line_id.location_id.id,
+        #         'location_id':res.quant_id.location_id.id,
         #         'product_uom_id':res.product_id.uom_id.id,
         #         'product_uom_qty':res.qty_allocated,
         #         'product_id':res.product_id.id,
@@ -75,9 +75,7 @@ class kits_reel_allocate_line(models.Model):
         # to_delete = self.env['stock.move.line']
         # for record in self:
         #     to_delete |= record.move_line_id
-
         res = super(kits_reel_allocate_line,self).unlink()
         # if res:
         #     to_delete.unlink()
-
         return res
