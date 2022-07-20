@@ -2,14 +2,27 @@
 <templates xml:space="preserve">
 
     <t t-name="kits_mrp_customization.MOMenu" owl="1">
-        <Dropdown class="o_mo_menu btn-group" togglerClass="'btn btn-light'" t-props="dropdownProps" t-on-dropdown-item-selected="onMOBySelected">
-            <t t-set-slot="toggler">
-                <span class="o_dropdown_title">Select MO<t t-if="props.showCaretDown"> <i class="fa fa-caret-down ml-1"/></t></span>
-            </t>
-            <t t-set="currentGroup" t-value="null"/>
-            <t t-foreach="items" t-as="item">
-                <DropdownItem class="o_item_option" t-att-class="{ selected: item.isActive }" payload="{ itemId: item.id}" parentClosingMode="'none'" t-esc="item.name"/>
-            </t>
-        </Dropdown>
+        <div t-if="modelName == 'stock.warehouse.orderpoint'">
+            <Dropdown class="o_mo_menu_dropdown btn-group" togglerClass="'btn btn-light'" t-props="dropdownProps" t-on-dropdown-item-selected="onMOBySelected">
+                <t t-set-slot="toggler">
+                    <t t-if="selectedMO">
+                        <span class="o_dropdown_title" t-esc="selectedMO"/>
+                    </t>
+                    <t t-else="">
+                        <span class="o_dropdown_title">Select MO</span>
+                    </t>
+                </t>
+                <t t-set="currentGroup" t-value="null"/>
+                <t t-foreach="items" t-as="item">
+                    <DropdownItem class="o_item_option" t-att-class="{ selected: item.isActive }" payload="{ itemId: item.id}" parentClosingMode="'none'" t-esc="item.name"/>
+                </t>
+            </Dropdown>
+            <button type="button" class="btn btn-secondary o_list_button_clear" title="Clear" data-hotkey="cl" t-on-click="onClearMOFilter">
+            <!-- <button type="button" class="btn o_list_button_clear" title="Clear" data-hotkey="cl" t-on-click="onClearMOFilter"> -->
+                    <!-- Clear -->
+                    <i class="fa fa-remove" style="font-size:18px;color:red"></i>
+                    <!-- <i class="fa fa-remove" style="font-size:18px;color:red"></i> Clear -->
+            </button>
+        </div>
     </t>
 </templates>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data>
+        <record id="serv_action_auto_allocate_reel" model="ir.actions.server">
+            <field name="name">Auto Allocate</field>
+            <field name="model_id" ref="stock.model_stock_warehouse_orderpoint" />
+            <field name="binding_model_id" ref="stock.model_stock_warehouse_orderpoint" />
+            <field name="state">code</field>
+            <field name="code">
+                action = records.action_auto_allocate_reels()
+            </field>
+            <field name="groups_id" eval="[(4, ref('base.group_erp_manager'))]" />
+        </record>
+    </data>
+
+</odoo>
