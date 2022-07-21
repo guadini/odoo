@@ -11,6 +11,8 @@ class stock_warehouse_orderpoint(models.Model):
 
     allocate_ids = fields.One2many('kits.reel.allocate','replenishment_id','#Lot Allocate')
     qty_satisfied = fields.Boolean('Total Allocated',compute="_compute_total")
+    mo_ids = fields.Many2many('mrp.production','replenishment_manufacturing_rel','replenishment_id','manufacturing_id','Manufacutring Orders',compute="_compute_total")
+    qty_to_consume = fields.Float('To Consume',compute="_compute_total")
 
     @api.depends('allocate_ids','allocate_ids.total_needed','allocate_ids.total_allocated')
     def _compute_total(self):
@@ -18,6 +20,13 @@ class stock_warehouse_orderpoint(models.Model):
             total_needed = sum(record.allocate_ids.mapped('total_needed'))
             total_allocated = sum(record.allocate_ids.mapped('total_allocated'))
             record.qty_satisfied = True if total_allocated and (total_needed <= total_allocated) else False
+
+            moves = self.env['stock.move'].search([('raw_material_production_id','!=',False),('product_id','=',record.product_id.id),('location_id','=',record.location_id.id),('raw_material_production_id.state','=','confirmed')])
+            manufacturing_ids = moves.mapped('raw_material_production_id')
+            record.mo_ids = [(6,0,manufacturing_ids.ids)]
+
+            qty = sum(moves.mapped('product_qty'))-sum(moves.mapped('reserved_availability'))
+            record.qty_to_consume = qty
 
     @api.depends('product_id','product_id.mt_product_alternative_ids','product_id.seller_ids','location_id')
     def _compute_details(self):
