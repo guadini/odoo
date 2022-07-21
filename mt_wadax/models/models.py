@@ -19,6 +19,7 @@ class ProductTemplate(models.Model):
 
 class MTProductAlternative(models.Model):
     _name = "mt.product.product"
+    _description = 'Product Product'
 
     mt_product_id = fields.Many2one("product.product", string="Name")
     name = fields.Char(string='Product', related='mt_product_id.name')
