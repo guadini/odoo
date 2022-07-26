@@ -8,13 +8,7 @@
             <field name="inherit_id" ref="stock.view_warehouse_orderpoint_tree_editable" />
             <field name="arch" type="xml">
                 <xpath expr="//tree" position="inside">
-                    <field name="mo_ids" widget="many2many_tags" />
-                    <field name="qty_to_consume" />
                     <field name="have_bom" invisible="1" />
-                    <field name="allocate_ids" invisible="1" />
-                    <field name="qty_satisfied" invisible="1" />
-                    <button name="action_open_reel_allocated" class="btn-success" type="object" string="Reels Allocation" context="{'all_qty_satisfied':True}" attrs="{'invisible':['|',('qty_satisfied','=',False),('allocate_ids','=',[])]}" />
-                    <button name="action_open_reel_allocated" class="btn-danger" type="object" string="Reels Allocation" context="{'all_qty_satisfied':False}" attrs="{'invisible':['|',('qty_satisfied','=',True),('allocate_ids','=',[])]}" />
                 </xpath>
                 <xpath expr="//tree" position="attributes">
                     <attribute name="default_order">have_bom desc</attribute>
