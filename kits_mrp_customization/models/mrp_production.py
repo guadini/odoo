@@ -1,6 +1,4 @@
-from odoo import models,_
-from odoo.tools.safe_eval import safe_eval
-from datetime import datetime
+from odoo import models,fields,_
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -28,10 +26,7 @@ class mrp_production(models.Model):
         value = False
         domain = []
         if domains.get('filter'):
-            for d in domains.get('filter'):
-                if type(safe_eval(d)) == list:
-                    ds = [tuple(z) for z in  safe_eval(d)]
-                    domain.extend(ds)
+            domain.extend(eval(domains.get('filter')))
 
         grouplist = domains.get('groupBy') if domains.get('groupBy') else {}
         try:
@@ -52,20 +47,15 @@ class mrp_production(models.Model):
                 value['target']='main'
                 if clear:
                     value['domain'] = False
-                    value['filter'] = domain if domain else False
                 else:
                     manufacturing_order = self.env['mrp.production'].search([('id','=',itemId)])
                     replenishment_obj = self.env['stock.warehouse.orderpoint'].sudo()
                     replenishment_id = replenishment_obj.search([('product_id','=',manufacturing_order.product_id.id),('location_id','=',manufacturing_order.location_dest_id.id)])
                     components_replenishment_ids = replenishment_obj.search([('product_id','in',manufacturing_order.bom_id.bom_line_ids.mapped('product_id').ids),('location_id','=',manufacturing_order.location_src_id.id)])
-                    # value['domain'] = [('id','in',replenishment_id.ids+components_replenishment_ids.ids)]
-                    value['domain'] = [('id','in',replenishment_id.ids+components_replenishment_ids.ids)]
-                    value['filter'] = domain if domain else False
-                    # domain.extend([('id','in',replenishment_id.ids+components_replenishment_ids.ids)])
-                    # value['domain'] = domain
-                value['context'] = str({'group_by': grouplist}) if grouplist else  value.get('context',"{}")
-            values={'action':value,'domains':domains}
-            return values
+                    domain.extend([('id','in',replenishment_id.ids+components_replenishment_ids.ids)])
+                    value['domain'] = str(domain) if domain else False
+                    value['context'] = grouplist if grouplist else  value.get('context',"{}")
+            return value
 
 
     def kits_clean_action(self,action, env):
@@ -105,3 +95,39 @@ class mrp_production(models.Model):
         ]
 
         return action
+
+    def action_assign(self):
+        allocate_line_ids = self.env['kits.reel.allocate.line'].search([('mo_id','=',self.id)])
+        move_not_found = allocate_line_ids.filtered(lambda x: x.product_id not in self.move_raw_ids.mapped('product_id'))
+
+        # Create moves of allocate lines whose products not available in MO lines.
+        for allocate_line in allocate_line_ids:
+            move = self.move_raw_ids.filtered(lambda x: x.product_id == allocate_line.product_id)
+            if move:
+                move.with_context(bypass_reservation_update=True).product_uom_qty = allocate_line.qty_allocated
+
+        for line in move_not_found:
+            if line.move_id and line.alternate_allocate_id:
+                qty_pending = line.move_id.product_qty - line.move_id.reserved_availability
+
+                # Set Main products qty to Assigned qty
+                line.move_id.with_context(bypass_reservation_update=True).product_uom_qty = line.move_id.product_uom_qty - qty_pending
+                
+                # Create alternate product's Component Line.
+                component_line_id = self.env['stock.move'].sudo().create({
+                        'raw_material_production_id':line.mo_id.id,
+                        'location_id':line.quant_id.location_id.id,
+                        'location_dest_id':line.mo_id.location_dest_id.id,
+                        'company_id':line.mo_id.company_id.id,
+                        'product_uom_qty':qty_pending,
+                        'product_id':line.product_id.id,
+                        'name':line.product_id.display_name,
+                        'product_uom':line.product_id.uom_id.id,
+                        'date':fields.Datetime.now(),
+                        'procure_method':'make_to_stock',
+                        'should_consume_qty':0,
+                    })
+                line.move_id = component_line_id
+
+        res = super(mrp_production,self).action_assign()
+        return res

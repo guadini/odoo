@@ -10,3 +10,5 @@ from . import stock_quant
 
 from . import kits_reel_allocate
 from . import kits_reel_allocate_line
+
+from . import stock_move

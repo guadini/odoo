@@ -17,11 +17,19 @@ class kits_reel_allocate_line(models.Model):
     def compute_details(self):
         for record in self:
             qty_allocated = 0
-            moves = self.env['stock.move'].search([('raw_material_production_id','!=',False),('product_id.is_reel','=',True),('location_id','=',record.replenishment_id.location_id.id),('raw_material_production_id.state','=','confirmed')])
-            qty_needed = sum(moves.mapped('product_qty'))
+            moves = self.env['stock.move'].search([('product_id','=',record.product_id.id),('raw_material_production_id','!=',False),('product_id.is_reel','=',True),('location_id','=',record.replenishment_id.location_id.id),('raw_material_production_id.state','=','confirmed')])
+            # qty_needed = sum(moves.mapped('product_uom_qty'))
+            qty_needed = 0
+            visited_component_lines = []
             for line in record.allocate_line_ids:
+                if line.component_line_id not in visited_component_lines:
+                    qty_needed += line.qty_needed
+                    visited_component_lines.append(line.component_line_id)
                 qty_allocated += line.qty_allocated
             for line in record.alternative_line_ids:
+                if line.component_line_id not in visited_component_lines:
+                    qty_needed += line.qty_needed
+                    visited_component_lines.append(line.component_line_id)
                 qty_allocated += line.qty_allocated
             
             record.write({'total_needed':qty_needed,'total_allocated':qty_allocated})

@@ -6,6 +6,7 @@ class product_template(models.Model):
     is_reel = fields.Boolean('Is Reel?')
     kits_critico = fields.Boolean('Critinal (Critico)')
     kits_mandatory = fields.Boolean('Mandatory')
+    multilocation_available = fields.Boolean('Available At Multiple Location')
 
     @api.onchange('is_reel')
     def _onchange_is_reel(self):

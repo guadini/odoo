@@ -1,9 +1,8 @@
 odoo.define('kits_mrp_customization.MOMenu', function (require) {
     "use strict";
-    const { useModel } = require('web.Model');
+    
     var rpc = require('web.rpc');
-    // var ajax = require("web.ajax");
-
+    const { useModel } = require('web.Model');
     const { Component } = owl;
 
     class MOMenu extends Component {
@@ -52,29 +51,19 @@ odoo.define('kits_mrp_customization.MOMenu', function (require) {
             var self = this;
             ev.stopPropagation();
             const { itemId } = ev.detail.payload;
-            const data = this.model.get('filters').filter(f=>f.isActive === true)
-            var filterDomain = [];
-            var groupByField = [];
-            $.each(data, function (key, value) {
-                if (value.type === 'filter') {
-                    filterDomain.push(value.domain);
-                } else if (value.type === 'groupBy') {
-                    groupByField.push(value.fieldName);
-                }
-            })
             var domains = {
-                'filter':filterDomain,
-                'groupBy':groupByField
+                'filter':this.model.get("irFilterValues").domain ? this.model.get("irFilterValues").domain : false,
+                'groupBy':this.model.get("irFilterValues").context ? this.model.get("irFilterValues").context : false,
             }
             if (itemId) {
                 return rpc.query({
                     model: 'mrp.production',
                     method: 'filter_replenishments',
                     args: [itemId,itemId,this.env.action.id,domains],
-                }).then(function(value) {
-                    if(value.action){
+                }).then(function (action) {
+                    if(action){
                         self.trigger('do-action', {
-                            action: value.action,
+                            action: action,
                             options: {
                                 on_close: () => this.trigger('reload'),
                             },
@@ -88,35 +77,23 @@ odoo.define('kits_mrp_customization.MOMenu', function (require) {
             var self = this;
             ev.stopPropagation();
             const { itemId } = false;
-            const data = this.model.get('filters').filter(f=>f.isActive === true)
-            var filterDomain = [];
-            var groupByField = [];
-            $.each(data, function (key, value) {
-                if (value.type === 'filter') {
-                    filterDomain.push(value.domain);
-                } else if (value.type === 'groupBy') {
-                    groupByField.push(value.fieldName);
-                }
-            })
             var domains = {
-                'filter':filterDomain,
-                'groupBy':groupByField
+                'filter':this.model.get("irFilterValues").domain ? this.model.get("irFilterValues").domain : false,
+                'groupBy':this.model.get("irFilterValues").context ? this.model.get("irFilterValues").context : false,
             }
             const clear = true;
             return rpc.query({
                 model: 'mrp.production',
                 method: 'filter_replenishments',
                 args: [itemId, itemId, this.env.action.id, domains, clear],
-            }).then(function (value) {
-                if(value.action){
+            }).then(function (action) {
+                if(action){
                     self.trigger('do-action', {
-                        action: value.action,
+                        action: action,
                         options: {
                             on_close: () => this.trigger('reload'),
                         },
                     });
-                }
-                if(value.domains){
                 }
             });
 

@@ -6,7 +6,7 @@ class Action(http.Controller):
     
     @http.route('/get-mo-ids', type='json',auth="public", website=True)
     def _get_mo_ids(self):
-        mos = request.env['mrp.production'].search(['|',('state','=','confirmed'),('state','=','progress')])
+        mos = request.env['mrp.production'].search([('state','in',('confirmed','progress'))])
         # mos = request.env['mrp.production'].search([])
         mo_data = []
         for mo in mos:
