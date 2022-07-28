@@ -104,7 +104,9 @@ class mrp_production(models.Model):
         for allocate_line in allocate_line_ids:
             move = self.move_raw_ids.filtered(lambda x: x.product_id == allocate_line.product_id)
             if move:
-                move.with_context(bypass_reservation_update=True).product_uom_qty = allocate_line.qty_allocated
+                allocate_id = self.env['kits.reel.allocate'].search(['|',('allocate_line_ids','in',allocate_line.ids),('alternative_line_ids','in',allocate_line.ids)],limit=1)
+                if allocate_id.replenishment_id.qty_satisfied:
+                    move.with_context(bypass_reservation_update=True).product_uom_qty = allocate_line.qty_allocated
 
         for line in move_not_found:
             if line.move_id and line.alternate_allocate_id:

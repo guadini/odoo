@@ -6,17 +6,18 @@ class stock_move(models.Model):
     def _action_assign(self):
         move_obj = self.env['stock.move']
         reel_components = move_obj
-        if not self._context.get('confirm_reel'):
-            for record in self:
-                if record.product_id.is_reel:
-                    reel_components |= record
+        if self.raw_material_production_id:
+            if not self._context.get('confirm_reel'):
+                for record in self:
+                    if record.product_id.is_reel:
+                        reel_components |= record
         self -= reel_components
         res = super(stock_move,self)._action_assign()
 
         allocate_line_ids = self.env['kits.reel.allocate.line'].search([('mo_id','=',self.mapped('raw_material_production_id').id)])
-        for reel_component in reel_components:
-            allocate_line_id = False
-            if allocate_line_ids:
+        if allocate_line_ids:
+            for reel_component in reel_components:
+                allocate_line_id = False
                 allocate_line_id = allocate_line_ids.filtered(lambda x: x.component_line_id == reel_component)
 
                 if not allocate_line_id:
@@ -35,7 +36,6 @@ class stock_move(models.Model):
                     quants = reel_component.location_id.quant_ids.filtered(lambda x: x.lot_id == lot_id and ((x.quantity - x.reserved_quantity) >= (reel_component.product_qty-reel_component.reserved_availability)))
                     if not quants:
                         continue
-
                     ml_id = self.env['stock.move.line'].create({
                         'move_id':reel_component.id,
                         'company_id':reel_component.company_id.id,
@@ -48,5 +48,5 @@ class stock_move(models.Model):
                         'lot_id':lot_id.id,
                         })
                     allocate_line_id.move_line_id = ml_id
-            reel_component.with_context(confirm_reel=True)._action_assign()
+                reel_component.with_context(confirm_reel=True)._action_assign()
         return res
