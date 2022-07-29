@@ -7,6 +7,8 @@ class product_template(models.Model):
     kits_critico = fields.Boolean('Critinal (Critico)')
     kits_mandatory = fields.Boolean('Mandatory')
     multilocation_available = fields.Boolean('Available At Multiple Location')
+    kits_fabricante = fields.Char('Fabricante')
+    kits_ref_fabricante = fields.Char('Ref Fabricante')
 
     @api.onchange('is_reel')
     def _onchange_is_reel(self):

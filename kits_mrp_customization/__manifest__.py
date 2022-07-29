@@ -24,7 +24,8 @@
         'views/stock_location_orderpoint_view.xml',
         'views/mrp_production_view.xml',
         'views/stock_quant_view.xml',
-        # 'views/kits_reel_allocate_view.xml',
+        'views/res_partner_view.xml',
+        
     ],
     # 'assets':{
     #     'web.assets_backend': [

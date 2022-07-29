@@ -17,6 +17,8 @@
                 <xpath expr="//notebook/page[@name='general_information']" position='inside'>
                     <group>
                         <group>
+                            <field name="kits_fabricante" />
+                            <field name="kits_ref_fabricante" />
                             <field name="kits_critico" />
                             <field name="kits_mandatory" />
                         </group>

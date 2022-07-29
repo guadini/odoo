@@ -7,6 +7,7 @@ from . import stock_location_route
 from . import stock_warehouse_orderpoint
 from . import mrp_production
 from . import stock_quant
+from . import res_partner
 
 # from . import kits_reel_allocate
 # from . import kits_reel_allocate_line

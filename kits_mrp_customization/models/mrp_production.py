@@ -1,6 +1,4 @@
-from odoo import models,_
-from odoo.tools.safe_eval import safe_eval
-from datetime import datetime
+from odoo import models,fields,_
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -28,10 +26,7 @@ class mrp_production(models.Model):
         value = False
         domain = []
         if domains.get('filter'):
-            for d in domains.get('filter'):
-                if type(safe_eval(d)) == list:
-                    ds = [tuple(z) for z in  safe_eval(d)]
-                    domain.extend(ds)
+            domain.extend(eval(domains.get('filter')))
 
         grouplist = domains.get('groupBy') if domains.get('groupBy') else {}
         try:
@@ -52,20 +47,15 @@ class mrp_production(models.Model):
                 value['target']='main'
                 if clear:
                     value['domain'] = False
-                    value['filter'] = domain if domain else False
                 else:
                     manufacturing_order = self.env['mrp.production'].search([('id','=',itemId)])
                     replenishment_obj = self.env['stock.warehouse.orderpoint'].sudo()
                     replenishment_id = replenishment_obj.search([('product_id','=',manufacturing_order.product_id.id),('location_id','=',manufacturing_order.location_dest_id.id)])
                     components_replenishment_ids = replenishment_obj.search([('product_id','in',manufacturing_order.bom_id.bom_line_ids.mapped('product_id').ids),('location_id','=',manufacturing_order.location_src_id.id)])
-                    # value['domain'] = [('id','in',replenishment_id.ids+components_replenishment_ids.ids)]
-                    value['domain'] = [('id','in',replenishment_id.ids+components_replenishment_ids.ids)]
-                    value['filter'] = domain if domain else False
-                    # domain.extend([('id','in',replenishment_id.ids+components_replenishment_ids.ids)])
-                    # value['domain'] = domain
-                value['context'] = str({'group_by': grouplist}) if grouplist else  value.get('context',"{}")
-            values={'action':value,'domains':domains}
-            return values
+                    domain.extend([('id','in',replenishment_id.ids+components_replenishment_ids.ids)])
+                    value['domain'] = str(domain) if domain else False
+                    value['context'] = grouplist if grouplist else  value.get('context',"{}")
+            return value
 
 
     def kits_clean_action(self,action, env):

@@ -56,10 +56,12 @@ class stock_warehouse_orderpoint(models.Model):
                             'trigger':'manual',
                             'product_max_qty':0,
                             'product_min_qty':0,
+                            'qty_to_order':0,
                             })
                         replenishment_id._onchange_location_id() # #Onchange call to set warehouse from location.
                     else:
                         # #Set warehouse if not set.
+                        replenishment_id.qty_to_order = 0
                         replenishment_id._onchange_location_id()
                         replenishment_id._compute_have_bom() # #Check bom each time in existing replenishments.
                         # #Set Route in existing Replenishment - According Requirement.
