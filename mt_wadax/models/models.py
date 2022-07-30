@@ -11,8 +11,7 @@ _logger = logging.getLogger(__name__)
 class ProductTemplate(models.Model):
     _inherit = "product.template"
 
-    mt_equipment_manufacturer = fields.Char(string='Manufacturer Equipment')
-    mt_ref_manufacturer = fields.Char(string='Manufacturer Ref')
+
     mt_product_alternative_ids = fields.One2many('mt.product.product', 'mt_product_tmpl_id',
                                                  string="Alternative Products")
 
@@ -28,8 +27,3 @@ class MTProductAlternative(models.Model):
     mt_product_tmpl_id = fields.Many2one("product.template", string="Product Tmpl id")
 
 
-class ProductProduct(models.Model):
-    _inherit = "product.product"
-
-    mt_equipment_manufacturer = fields.Char(string='Manufacturer Equipment')
-    mt_ref_manufacturer = fields.Char(string='Manufacturer Ref')
