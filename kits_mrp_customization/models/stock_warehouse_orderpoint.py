@@ -1,4 +1,5 @@
 from odoo import models,fields,api,_
+from lxml import etree
 
 class stock_warehouse_orderpoint(models.Model):
     _inherit = 'stock.warehouse.orderpoint'
@@ -8,9 +9,39 @@ class stock_warehouse_orderpoint(models.Model):
     have_bom = fields.Boolean('Have BOM ?',compute='_compute_have_bom',store=True,compute_sudo=True)
     vendor_ids = fields.Many2many('product.supplierinfo','replenishment_supplierinfo_rel','replenishment_id','supplier_id','Vendors',compute='_compute_details',store=True,compute_sudo=True)
     kits_on_hand = fields.Float('On Hand',compute="_compute_details",store=True,compute_sudo=True)
+    mo_ids = fields.Many2many('mrp.production','replenishment_manufacturing_rel','replenishment_id','manufacturing_id','Manufacutring Orders',compute="_compute_total")
+    qty_total_consume = fields.Float('Total Consume',compute="_compute_total")
+    qty_to_consume = fields.Float('To Consume',compute="_compute_total")
 
-  
-   
+    # @api.depends('allocate_ids','allocate_ids.total_needed','allocate_ids.total_allocated')
+    def _compute_total(self):
+        mo_obj = self.env['mrp.production'].sudo()
+        for record in self:
+            moves = self.env['stock.move'].search([('raw_material_production_id','!=',False),('location_id','=',record.location_id.id),('product_id','=',record.product_id.id),('raw_material_production_id.state','in',('confirmed','progress'))])
+            done_moves = moves.filtered(lambda x: x.product_uom_qty <= x.reserved_availability)
+            moves -= done_moves
+            manufacturing_ids = moves.mapped('raw_material_production_id')
+            record.mo_ids = [(6,0,manufacturing_ids.ids)]
+
+    #         total_needed = sum(record.allocate_ids.mapped('total_needed'))
+    #         total_allocated = sum(record.allocate_ids.mapped('total_allocated'))
+    #         record.qty_satisfied = True if total_allocated and (total_needed <= total_allocated) else True if not moves and done_moves else False
+
+            qty = sum(moves.mapped('product_qty'))-sum(moves.mapped('reserved_availability'))
+            record.qty_total_consume = qty
+            to_consume = 0
+            mo_id = record._context.get('mo_id')
+            # if record.product_id.is_reel and mo_id:
+            if mo_id:
+                mo = mo_obj
+                if isinstance(mo_id,int):
+                    mo = mo_obj.browse(mo_id)
+                if mo.id:
+                    qty_in_moves = mo.move_raw_ids.filtered(lambda x: x.product_id == record.product_id).mapped('product_uom_qty')
+                    to_consume = sum(qty_in_moves) if len(qty_in_moves) else 0
+            record.qty_to_consume = to_consume
+    #         record.qty_to_order = total_allocated
+
     @api.depends('product_id','product_id.mt_product_alternative_ids','product_id.seller_ids','location_id')
     def _compute_details(self):
         for record in self:

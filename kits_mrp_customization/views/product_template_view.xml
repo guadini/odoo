@@ -25,7 +25,8 @@
                     </group>
                 </xpath>
                 <field name="tracking" position="attributes">
-                    <attribute name="attrs">{'invisible': [('tracking', '=', 'none')],'readonly':[('is_reel','=',True)]}</attribute>
+                    <attribute name="attrs">{'readonly':[('is_reel','=',True)]}</attribute>
+                    <attribute name="force_save">True</attribute>
                 </field>
             </field>
         </record>
