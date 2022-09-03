@@ -17,6 +17,7 @@ class mrp_production(models.Model):
             'res_model':'stock.warehouse.orderpoint',
             'view_mode':'tree,form',
             'domain':[('id','in',replenishment_id.ids+components_replenishment_ids.ids)],
+            'context':{'mo_id':self.id},
             'target':'self',
         }
 

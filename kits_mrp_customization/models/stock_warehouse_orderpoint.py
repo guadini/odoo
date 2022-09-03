@@ -30,13 +30,12 @@ class stock_warehouse_orderpoint(models.Model):
         warehouse_obj = self.env['stock.warehouse'].sudo()
         route_obj = self.env['stock.location.route'].sudo()
         locations = warehouse_obj.search([]).mapped('lot_stock_id')
-        default_wh_loc_id = warehouse_obj.search([('system_default','=',True)],limit=1)
+        default_wh_id = warehouse_obj.search([('system_default','=',True)],limit=1)
 
         default_buying_route = route_obj.search([('buying_default','=',True)],limit=1)
         default_manufacture_route = route_obj.search([('manufacture_default','=',True)],limit=1)
-        default_spfw_route = route_obj.search([('spfw_default','=',True)],limit=1)
 
-        if default_wh_loc_id and default_buying_route and default_manufacture_route and default_spfw_route:
+        if default_wh_id and default_buying_route and default_manufacture_route:
             for product in self.env['product.product'].sudo().search([]):
                 for location in locations:
                     route_id = route_obj
@@ -44,10 +43,16 @@ class stock_warehouse_orderpoint(models.Model):
                     if self.env['mrp.bom'].sudo().search([('product_tmpl_id','=',product.product_tmpl_id.id)],limit=1):
                         route_id = default_manufacture_route
                     else:
-                        if location == default_wh_loc_id.lot_stock_id:
+                        if location == default_wh_id.lot_stock_id:
                             route_id = default_buying_route
                         else:
-                            route_id = default_spfw_route
+                            spfw_route = route_obj.search([
+                                ('supplier_wh_id','=',default_wh_id.id),
+                                ('supplied_wh_id','=',location.warehouse_id.id)
+                                ],limit=1)
+                            if not spfw_route:
+                                continue
+                            route_id = spfw_route
                     if not replenishment_id:
                         replenishment_id = self.sudo().create({
                             'product_id':product.id,
@@ -60,12 +65,11 @@ class stock_warehouse_orderpoint(models.Model):
                             })
                         replenishment_id._onchange_location_id() # #Onchange call to set warehouse from location.
                     else:
-                        # #Set warehouse if not set.
-                        replenishment_id.qty_to_order = 0
+                        # ###Set warehouse if not set.
                         replenishment_id._onchange_location_id()
                         replenishment_id._compute_have_bom() # #Check bom each time in existing replenishments.
                         # #Set Route in existing Replenishment - According Requirement.
                         if route_id and route_id.id:
                             replenishment_id.route_id = route_id.id
 
-   
+

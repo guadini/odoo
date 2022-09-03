@@ -24,6 +24,9 @@
                         </group>
                     </group>
                 </xpath>
+                <field name="tracking" position="attributes">
+                    <attribute name="attrs">{'invisible': [('tracking', '=', 'none')],'readonly':[('is_reel','=',True)]}</attribute>
+                </field>
             </field>
         </record>
     </data>
