@@ -14,7 +14,7 @@ class product_template(models.Model):
     def _onchange_is_reel(self):
         for record in self:
             if record.is_reel:
-                record.type = 'product'
+                record.detailed_type = 'product'
                 record.tracking = 'lot'
             else:
                 record.tracking = 'none'

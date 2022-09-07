@@ -1,4 +1,1 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_kits_reel_allocate,access.kits.reel.allocate,model_kits_reel_allocate,,1,1,1,0
-access_kits_reel_allocate_admin,access.kits.reel.allocate.admin,model_kits_reel_allocate,base.group_system,1,1,1,1
-access_kits_reel_allocate_line,access.kits.reel.allocate.line,model_kits_reel_allocate_line,,1,1,1,1
