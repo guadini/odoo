@@ -1,3 +1,4 @@
+from numpy import isin
 from odoo import models,api,fields,_
 from odoo.exceptions import UserError
 
@@ -30,6 +31,12 @@ class stock_quant(models.Model):
     
     def _get_inventory_fields_create(self):
         res = super(stock_quant,self)._get_inventory_fields_create()
+        if isinstance(res,list):
+            res.append('reel_type')
+        return res
+    
+    def _get_inventory_fields_write(self):
+        res = super(stock_quant,self)._get_inventory_fields_write()
         if isinstance(res,list):
             res.append('reel_type')
         return res
