@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data>
+        <record id="kits_mrp_customization_inherit_stock_warehouse_orderpoint_tree_view" model="ir.ui.view">
+            <field name="name">kits.mrp.customization.inherit.stock.warehouse.orderpoint.tree.view</field>
+            <field name="model">stock.warehouse.orderpoint</field>
+            <field name="inherit_id" ref="stock.view_warehouse_orderpoint_tree_editable" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='qty_to_order']" position="after">
+                    <field name="qty_total_consume" />
+                    <field name="qty_to_consume" invisible="not context.get('mo_id')" />
+                </xpath>
+                <xpath expr="//tree" position="inside">
+                    <field name="mo_ids" widget="many2many_tags" />
+                    <field name="have_bom" invisible="1" />
+                </xpath>
+                <xpath expr="//tree" position="attributes">
+                    <attribute name="default_order">have_bom desc</attribute>
+                    <attribute name="decoration-success">have_bom == True</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="kits_mrp_customization_inherit_stock_warehouse_orderpoint_search_view" model="ir.ui.view">
+            <field name="name">kits.mrp.customization.inherit.stock.warehouse.orderpoint.search.view</field>
+            <field name="model">stock.warehouse.orderpoint</field>
+            <field name="inherit_id" ref="stock.stock_reorder_report_search" />
+            <field name="arch" type="xml">
+                <xpath expr="//filter[@name='filter_not_snoozed']" position="after">
+                    <separator/>
+                    <filter name="filter_manufacture_products" string="Manufactured Products" domain="[('have_bom', '=', True)]" />
+                    <filter name="filter_bom_components" string="BOM Components" domain="[('have_bom', '=', False)]" />
+                    <filter name="filter_sale_ok" string="Can be Sold" domain="[('product_id.sale_ok', '=', True)]" />
+                    <filter name="filter_purchase_ok" string="Can be Purchased" domain="[('product_id.purchase_ok', '=', True)]" />
+                    <filter name="filter_reel_strips" string="Reel/Strips Components" domain="[('product_id.is_reel', '=', True)]" />
+                    <filter name="filter_mandatory" string="Mandatory" domain="[('product_id.kits_mandatory', '=', True)]" />
+                    <filter name="filter_critical" string="Critical" domain="[('product_id.kits_critico', '=', True)]" />
+                    <separator/>
+                </xpath>
+                <xpath expr="//filter[@name='groupby_category']" position="after">
+                    <filter name="groupby_route" string="Route" domain="[]" context="{'group_by': 'route_id'}" />
+                </xpath>
+            </field>
+        </record>
+    </data>
+
+</odoo>
