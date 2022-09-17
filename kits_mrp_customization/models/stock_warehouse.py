@@ -10,5 +10,5 @@ class stock_warehouse(models.Model):
     def _check_system_default(self):
         wh_obj = self.env['stock.warehouse']
         for record in self:
-            if wh_obj.search([('id','!=',record.id),('system_default','=',True)],limit=1):
+            if record.system_default and wh_obj.search([('id','!=',record.id),('system_default','=',True)],limit=1):
                 raise UserError(_('There can only be one default Warehouse !'))
