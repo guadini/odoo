@@ -12,6 +12,12 @@ class stock_warehouse_orderpoint(models.Model):
     mo_ids = fields.Many2many('mrp.production','replenishment_manufacturing_rel','replenishment_id','manufacturing_id','Manufacutring Orders',compute="_compute_total")
     qty_total_consume = fields.Float('Total Consume',compute="_compute_total")
     qty_to_consume = fields.Float('To Consume',compute="_compute_total")
+    is_reel = fields.Boolean('Is reel ?',compute="_compute_is_reel",store=True,compute_sudo=True)
+
+    @api.depends('product_id','product_id.is_reel')
+    def _compute_is_reel(self):
+        for record in self:
+            record.is_reel = record.product_id.is_reel
 
     # @api.depends('allocate_ids','allocate_ids.total_needed','allocate_ids.total_allocated')
     def _compute_total(self):
