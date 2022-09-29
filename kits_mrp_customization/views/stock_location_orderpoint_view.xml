@@ -7,6 +7,9 @@
             <field name="model">stock.warehouse.orderpoint</field>
             <field name="inherit_id" ref="stock.view_warehouse_orderpoint_tree_editable" />
             <field name="arch" type="xml">
+                <xpath expr="//field[@name='product_id']" position="after">
+                    <field name="is_reel" />
+                </xpath>
                 <xpath expr="//field[@name='qty_to_order']" position="after">
                     <field name="qty_total_consume" />
                     <field name="qty_to_consume" invisible="not context.get('mo_id')" />

@@ -10,7 +10,8 @@ class mrp_production(models.Model):
         replenishment_obj = self.env['stock.warehouse.orderpoint'].sudo()
         self.ensure_one()
         replenishment_id = replenishment_obj.search([('product_id','=',self.product_id.id),('location_id','=',self.location_dest_id.id)])
-        components_replenishment_ids = replenishment_obj.search([('product_id','in',self.bom_id.bom_line_ids.mapped('product_id').ids),('location_id','=',self.location_src_id.id)])
+        # components_replenishment_ids = replenishment_obj.search([('product_id','in',self.bom_id.bom_line_ids.mapped('product_id').ids),('location_id','=',self.location_src_id.id)])
+        components_replenishment_ids = replenishment_obj.search([('product_id','in',self.move_raw_ids.mapped('product_id').ids),('location_id','=',self.location_src_id.id)])
         return {
             'name':_('Replenishments'),
             'type':'ir.actions.act_window',
@@ -52,7 +53,8 @@ class mrp_production(models.Model):
                     manufacturing_order = self.env['mrp.production'].search([('id','=',itemId)])
                     replenishment_obj = self.env['stock.warehouse.orderpoint'].sudo()
                     replenishment_id = replenishment_obj.search([('product_id','=',manufacturing_order.product_id.id),('location_id','=',manufacturing_order.location_dest_id.id)])
-                    components_replenishment_ids = replenishment_obj.search([('product_id','in',manufacturing_order.bom_id.bom_line_ids.mapped('product_id').ids),('location_id','=',manufacturing_order.location_src_id.id)])
+                    # components_replenishment_ids = replenishment_obj.search([('product_id','in',manufacturing_order.bom_id.bom_line_ids.mapped('product_id').ids),('location_id','=',manufacturing_order.location_src_id.id)])
+                    components_replenishment_ids = replenishment_obj.search([('product_id','in',manufacturing_order.move_raw_ids.mapped('product_id').ids),('location_id','=',manufacturing_order.location_src_id.id)])
                     domain.extend([('id','in',replenishment_id.ids+components_replenishment_ids.ids)])
                     value['domain'] = str(domain) if domain else False
                     value['context'] = grouplist if grouplist else  value.get('context',"{}")
