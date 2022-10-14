@@ -14,3 +14,6 @@ class stock_move(models.Model):
         self -= reel_components
         res = super(stock_move,self)._action_assign()
         return res
+
+    def _do_unreserve(self):
+        return super(stock_move,self.with_context(bypass_reservation_update=True))._do_unreserve()
