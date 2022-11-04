@@ -23,3 +23,7 @@ class stock_picking(models.Model):
                             move_line.product_id.next_auto_lot_number = next_auto_number+1
         res = super(stock_picking,self).button_validate()
         return res
+    
+    def write(self,vals):
+        self = self.with_context(bypass_reservation_update=True)
+        return super(stock_picking,self).write(vals)
