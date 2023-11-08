@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<template id="producttemplatelabel_2_5x5">
+    <t t-call="web.basic_layout">
+        <div class="page">
+            <t t-call="product_print_label_wadax.report_productlabel_2_5x5">
+                <t t-set="products" t-value="products"/>
+            </t>
+        </div>
+    </t>
+</template>
+
+</odoo>
