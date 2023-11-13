@@ -8,15 +8,15 @@
                 <strong>Sku Wadax: <span t-field="product.default_code"/></strong><br/>
                 <strong>Sku Fabricante: <span t-field="product.kits_ref_fabricante"/></strong><br/>
                 <small class="text-nowrap">
-                    <strong>Cantidad: <span t-esc="receipt_qty"/></strong><br/>
-                    <strong>Ubicación: <span t-esc="location_dest"/></strong>
+                    <strong>Cantidad: <span t-esc="cantidad"/></strong><br/>
+                    <strong>Ubicación: <span t-esc="location_dest"/></strong><br/>
                 </small>
             </div>
             <t t-if="barcode">
                 <div 
                     class= "text-center"
                     t-out="barcode"
-                    t-options="{'widget': 'barcode', 'width': 600, 'height': 200, 'img_style': 'width:90%;height:30%;'}"
+                    t-options="{'widget': 'barcode', 'img_style': 'width:90%;height:30%;'}"
                     style="margin-top: 5px;"
                 />
             </t>
@@ -30,9 +30,17 @@
         <t t-foreach="quantity.items()" t-as="barcode_and_qty_by_product">
             <t t-set="product" t-value="barcode_and_qty_by_product[0]"/>
             <t t-foreach="barcode_and_qty_by_product[1]" t-as="barcode_and_qty">
+                <t t-if="location_dest_by_product">
+                    <t t-foreach="location_dest_by_product.items()" t-as="location">
+                        <t t-if="int(location[0]) == int(product.id)">
+                            <t t-set="location_dest" t-value="location[1]"/>
+                        </t>
+                    </t>
+                </t>
                 <t t-set="barcode" t-value="barcode_and_qty[0]"/>
                 <t t-set="receipt_qty" t-value="barcode_and_qty[1]"/>
                 <t t-foreach="range(barcode_and_qty[1])" t-as="qty">
+                    <t t-set="cantidad" t-value="1"/>
                     <t t-call="product_print_label_wadax.report_simple_label_2_5x5"/>
                 </t>
             </t>
