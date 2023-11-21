@@ -34,11 +34,33 @@ class ProductLabelLayout(models.TransientModel):
                 self.rows = 9
                 self.columns = 2
             location_destination = defaultdict(list)
+            line_qty_done = defaultdict(list)
+            line_purchase_amount = defaultdict(list)
             custom_barcodes = defaultdict(list)
             uom_unit = self.env.ref('uom.product_uom_categ_unit', raise_if_not_found=False)
             product_with_lots = []
+            data["has_type"] = True if self.move_line_ids.filtered(lambda l:l.type) else False
+
+            # with type
             # Picking... Transfer Quantities
-            if self.picking_quantity == 'picking' and self.move_line_ids:
+            if self.picking_quantity in ['picking', 'custom'] and self.move_line_ids and self.move_line_ids.filtered(lambda l:l.type):
+                move_line_ids = self.move_line_ids.filtered(lambda l:l.type)
+                data['quantity_by_product'] = {k: 1 for k, v in data.get('quantity_by_product').items()}
+                for line in move_line_ids:
+                    if not (line.lot_id or line.lot_name) and int(line.qty_done):
+                        location_destination[line.product_id.id].append(("", line.location_dest_id.display_name))
+                        line_qty_done[line.product_id.id].append(("", line.qty_done))
+                        line_purchase_amount[line.product_id.id].append(("", "{:,}".format(round(line.qty_done * sum(line.move_id.purchase_line_id.filtered(lambda p:p.product_id == line.product_id).mapped('price_unit')), 2))))
+                        continue
+
+                data['location_dest_by_product'] = location_destination
+                data['line_qty_done_by_product'] = line_qty_done
+                data['line_purchase_amount_by_product'] = line_purchase_amount
+                data['location_destination_temp'] = line.picking_id.location_dest_id.display_name
+
+            # with no type
+            # Picking... Transfer Quantities
+            if self.picking_quantity == 'picking' and self.move_line_ids and not self.move_line_ids.filtered(lambda l:l.type):
                 move_line_ids = self.move_line_ids
                 if self.product_select_ids:
                     move_line_ids = self.move_line_ids.filtered(lambda l: l.product_id in self.product_select_ids)
@@ -57,7 +79,7 @@ class ProductLabelLayout(models.TransientModel):
                 data['location_dest_by_product'] = location_destination
                 data['location_destination_temp'] = line.picking_id.location_dest_id.display_name
             # Custom
-            if self.picking_quantity == 'custom' and self.move_line_ids:
+            if self.picking_quantity == 'custom' and self.move_line_ids and not self.move_line_ids.filtered(lambda l:l.type):
                 move_line_ids = self.move_line_ids
                 if self.product_select_ids:
                     move_line_ids = self.move_line_ids.filtered(lambda l: l.product_id in self.product_select_ids)
