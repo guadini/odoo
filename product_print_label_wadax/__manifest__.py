@@ -9,7 +9,7 @@ Wadax - Product Print Label
     "contributors": ["Francis Del Rosario"],
     "website": "https://www.eduwebgroup.com",
     "category": "Sales/Sales & Reporting",
-    "version": "15.0.0.3",
+    "version": "15.0.0.4",
     "depends": ["stock", "kits_mrp_customization"],
     "data": [
         'report/product_reports.xml',

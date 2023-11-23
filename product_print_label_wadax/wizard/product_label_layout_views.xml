@@ -13,6 +13,7 @@
             </xpath>
             <xpath expr='//field[@name="print_format"]' position="after">
                 <field name="is_multiple_label_in_paper" attrs="{'invisible': ['|', ('print_format', '!=', '2.5x5'), ('move_line_ids', '=', False)]}"/>
+                <field name="is_generate_unmarked_line_type" attrs="{'invisible': ['|', ('print_format', '!=', '2.5x5'), ('move_line_ids', '=', False)]}"/>
                 <field name="move_line_ids" invisible="1">
                     <tree>
                         <field name="product_id"/>
