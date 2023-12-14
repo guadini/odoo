@@ -35,7 +35,6 @@ class ProductLabelLayout(models.TransientModel):
                 self.columns = 2
             location_destination = defaultdict(list)
             line_qty_done = defaultdict(list)
-            line_purchase_amount = defaultdict(list)
             custom_barcodes = defaultdict(list)
             uom_unit = self.env.ref('uom.product_uom_categ_unit', raise_if_not_found=False)
             product_with_lots = []
@@ -55,7 +54,6 @@ class ProductLabelLayout(models.TransientModel):
                         if (line.lot_id or line.lot_name) and int(line.qty_done):
                             location_destination[line.product_id.id].append((line.lot_id.name or line.lot_name, line.location_dest_id.display_name))
                             line_qty_done[line.product_id.id].append(("", line.qty_done))
-                            line_purchase_amount[line.product_id.id].append(("", "{:,}".format(round(line.qty_done * sum(line.move_id.purchase_line_id.filtered(lambda p:p.product_id == line.product_id).mapped('price_unit')), 2))))
                             # we intend to print only 1 label
                             custom_barcodes[line.product_id.id].append((line.lot_id.name or line.lot_name, int(1)))
                             continue
@@ -63,7 +61,6 @@ class ProductLabelLayout(models.TransientModel):
                     if not (line.lot_id or line.lot_name) and int(line.qty_done):
                         location_destination[line.product_id.id].append(("", line.location_dest_id.display_name))
                         line_qty_done[line.product_id.id].append(("", line.qty_done))
-                        line_purchase_amount[line.product_id.id].append(("", "{:,}".format(round(line.qty_done * sum(line.move_id.purchase_line_id.filtered(lambda p:p.product_id == line.product_id).mapped('price_unit')), 2))))
                         continue
 
             # with no type
@@ -121,7 +118,6 @@ class ProductLabelLayout(models.TransientModel):
             data['custom_barcodes'] = custom_barcodes
             data['location_dest_by_product'] = location_destination
             data['line_qty_done_by_product'] = line_qty_done
-            data['line_purchase_amount_by_product'] = line_purchase_amount
             data['location_destination_temp'] = line.picking_id.location_dest_id.display_name
         return xml_id, data
 

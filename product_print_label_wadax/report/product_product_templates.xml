@@ -14,9 +14,6 @@
                 <strong>Sku Wadax: <span t-field="product.default_code"/></strong><br/>
                 <strong>Sku Fabricante: <span t-field="product.kits_ref_fabricante"/></strong><br/>
                 <strong>Cantidad: <span t-esc="cantidad"/></strong><br/>
-                <t t-if="has_line_type">
-                    <strong>Amount: <span t-esc="purchase_amount"/></strong><br/>
-                </t>
                 <strong>Ubicación: <span t-esc="ubicacion"/></strong>
             </div>
             <div class="text-center o_label_small_barcode">
@@ -32,21 +29,16 @@
 <template id="report_simple_label_2_5x5">
     <div style="page-break-before: always; padding: 1px;">
         <div class="o_label_full" t-att-style="table_style">
-            <div class="text-left" style="font-size: 8px; max-width: 120px; min-width: 80px; white-space: nowrap;">
+            <div class="text-left" style="font-size: 9px; max-width: 120px; min-width: 80px; white-space: nowrap;">
                 <strong>Sku Wadax: <span t-field="product.default_code"/></strong>
             </div>
-            <div class="text-left" style="font-size: 8px; max-width: 120px; min-width: 80px; white-space: nowrap;">
+            <div class="text-left" style="font-size: 9px; max-width: 120px; min-width: 80px; white-space: nowrap;">
                 <strong>Sku Fabricante: <span t-field="product.kits_ref_fabricante"/></strong>
             </div>
-            <div class="text-left" style="font-size: 8px; max-width: 120px; min-width: 80px; white-space: nowrap;">
+            <div class="text-left" style="font-size: 9px; max-width: 120px; min-width: 80px; white-space: nowrap;">
                 <strong>Cantidad: <span t-esc="cantidad"/></strong>
             </div>
-            <t t-if="has_line_type">
-                <div class="text-left" style="font-size: 8px; max-width: 120px; min-width: 80px; white-space: nowrap;">
-                    <strong>Amount: <span t-esc="purchase_amount"/></strong>
-                </div>
-            </t>
-            <div class="text-left" style="font-size: 8px; max-width: 120px; min-width: 80px; white-space: nowrap;">
+            <div class="text-left" style="font-size: 9px; max-width: 120px; min-width: 80px; white-space: nowrap;">
                 <strong>Ubicación: <span t-esc="ubicacion"/></strong>
             </div>
             <t t-if="barcode">
@@ -56,7 +48,7 @@
                     t-options="{'widget': 'barcode', 'img_style': 'width:90%;height:30%;'}"
                     style="margin-top: 5px;"
                 />
-                <div class="text-center" style="font-size: 8px;">
+                <div class="text-center" style="font-size: 9px;">
                     <span t-esc="barcode"/>
                 </div>
             </t>
@@ -83,7 +75,6 @@
                                         <t t-set="barcode" t-value="barcode_and_qty[0]"/>
                                         <t t-set="current_quantity" t-value="barcode_and_qty[1]"/>
                                         <t t-set="cantidad" t-value="1"/>
-                                        <t t-set="purchase_amount" t-value="0"/>
                                         <t t-set="has_line_type" t-value="has_type"/>
                                         <!-- ubicacion/location -->
                                         <t t-if="location_dest_by_product">
@@ -109,18 +100,6 @@
                                                 </t>
                                             </t>
                                         </t>
-
-                                        <!-- purchase amount -->
-                                        <t t-if="line_purchase_amount_by_product and has_line_type">
-                                            <t t-foreach="line_purchase_amount_by_product.items()" t-as="purchase_line">
-                                                <t t-if="int(product.id) == int(purchase_line[0])">
-                                                    <t t-foreach="purchase_line[1]" t-as="p_line">
-                                                        <t t-set="purchase_amount" t-value="p_line[1]"/>
-                                                    </t>
-                                                </t>
-                                            </t>
-                                        </t>
-
                                     </t>
                                     <t t-if="current_quantity">
                                         <t t-set="make_invisible" t-value="False"/>
@@ -150,7 +129,6 @@
                     <t t-set="barcode" t-value="barcode_and_qty[0]"/>
                     <t t-set="receipt_qty" t-value="barcode_and_qty[1]"/>
                     <t t-set="cantidad" t-value="1"/>
-                    <t t-set="purchase_amount" t-value="0"/>
                     <t t-set="has_line_type" t-value="has_type"/>
 
                     <!-- ubicacion/location -->
@@ -173,17 +151,6 @@
                             <t t-if="int(product.id) == int(qty_done[0])">
                                 <t t-foreach="qty_done[1]" t-as="qty">
                                     <t t-set="cantidad" t-value="qty[1]"/>
-                                </t>
-                            </t>
-                        </t>
-                    </t>
-
-                    <!-- purchase amount -->
-                    <t t-if="line_purchase_amount_by_product and has_line_type">
-                        <t t-foreach="line_purchase_amount_by_product.items()" t-as="purchase_line">
-                            <t t-if="int(product.id) == int(purchase_line[0])">
-                                <t t-foreach="purchase_line[1]" t-as="p_line">
-                                    <t t-set="purchase_amount" t-value="p_line[1]"/>
                                 </t>
                             </t>
                         </t>
