@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data>
+        <!-- Paper Format -->
+        <record id="paperformat_label_sheet_2_5x5" model="report.paperformat">
+            <field name="name">2.5 x 5 Product Label Sheet</field>
+            <field name="default" eval="True" />
+            <field name="format">custom</field>
+            <field name="page_height">55</field>
+            <field name="page_width">30</field>
+            <field name="orientation">Landscape</field>
+            <field name="margin_top">0</field>
+            <field name="margin_bottom">0</field>
+            <field name="margin_left">0</field>
+            <field name="margin_right">0</field>
+            <field name="disable_shrinking" eval="True"/>
+            <field name="dpi">96</field>
+        </record>
+
+        <!-- Calling XML report -->
+
+        <record id="report_product_template_label_2_5x5" model="ir.actions.report">
+            <field name="name">Product Label (PDF)</field>
+            <field name="model">product.template</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">product_print_label_wadax.label_2_5x5</field>
+            <field name="report_file">product_print_label_wadax.label_2_5x5</field>
+            <field name="paperformat_id" ref="product_print_label_wadax.paperformat_label_sheet_2_5x5"/>
+            <field name="print_report_name">'Products Labels - %s' % (object.name)</field>
+            <field name="binding_type">report</field>
+        </record>
+
+        <record id="report_product_template_label_2_5x5_multiple" model="ir.actions.report">
+            <field name="name">Product Label (PDF)</field>
+            <field name="model">product.template</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">product_print_label_wadax.label_2_5x5_multiple</field>
+            <field name="report_file">product_print_label_wadax.label_2_5x5_multiple</field>
+            <field name="paperformat_id" ref="product.paperformat_label_sheet"/>
+            <field name="print_report_name">'Products Labels - %s' % (object.name)</field>
+            <field name="binding_model_id" eval="False"/>
+            <field name="binding_type">report</field>
+        </record>
+
+    </data>
+
+</odoo>

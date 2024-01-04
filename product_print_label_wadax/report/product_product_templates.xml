@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+<template id="report_simple_label_2_5x5_multiple">
+    <t t-set="barcode_size" t-value="'width:90%;height:25%;'"/>
+    <t t-set="table_style" t-value="'width:50mm;height:25mm; border: 1px solid black; padding: 1px;'"/>
+    <t t-if="has_line_type">
+        <t t-set="barcode_size" t-value="'width:90%;height:18%;'"/>
+        <t t-set="table_style" t-value="'width:50mm;height:25mm; border: 1px solid black; padding: 0.5px;'"/>
+    </t>
+    <td t-att-style="make_invisible and 'visibility:hidden;'" >
+        <div class="o_label_full" t-att-style="table_style">
+            <div class="text-left" style="font-size: 8px; max-width: 120px; min-width: 80px; white-space: nowrap;">
+                <strong>Sku Wadax: <span t-field="product.default_code"/></strong><br/>
+                <strong>Sku Fabricante: <span t-field="product.kits_ref_fabricante"/></strong><br/>
+                <strong>Cantidad: <span t-esc="cantidad"/></strong><br/>
+                <strong>Ubicación: <span t-esc="ubicacion"/></strong>
+            </div>
+            <div class="text-center o_label_small_barcode">
+                <t t-if="barcode">
+                    <div class="text-center" t-out="barcode" style="padding:0;" t-options="{'widget': 'barcode', 'symbology': 'auto', 'img_style': barcode_size}"/>
+                    <span class="text-center" t-esc="barcode"/>
+                </t>
+            </div>
+        </div>
+    </td>
+</template>
+
+<template id="report_simple_label_2_5x5">
+    <div style="page-break-before: always; padding: 1px;">
+        <div class="o_label_full" t-att-style="table_style">
+            <div class="text-left" style="font-size: 9px; max-width: 120px; min-width: 80px; white-space: nowrap;">
+                <strong>Sku Wadax: <span t-field="product.default_code"/></strong>
+            </div>
+            <div class="text-left" style="font-size: 9px; max-width: 120px; min-width: 80px; white-space: nowrap;">
+                <strong>Sku Fabricante: <span t-field="product.kits_ref_fabricante"/></strong>
+            </div>
+            <div class="text-left" style="font-size: 9px; max-width: 120px; min-width: 80px; white-space: nowrap;">
+                <strong>Cantidad: <span t-esc="cantidad"/></strong>
+            </div>
+            <div class="text-left" style="font-size: 9px; max-width: 120px; min-width: 80px; white-space: nowrap;">
+                <strong>Ubicación: <span t-esc="ubicacion"/></strong>
+            </div>
+            <t t-if="barcode">
+                <div
+                    class= "text-center"
+                    t-out="barcode"
+                    t-options="{'widget': 'barcode', 'img_style': 'width:90%;height:30%;'}"
+                    style="margin-top: 5px;"
+                />
+                <div class="text-center" style="font-size: 9px;">
+                    <span t-esc="barcode"/>
+                </div>
+            </t>
+        </div>
+    </div>
+</template>
+
+<template id="report_productlabel_2_5x5">
+    <t t-call="web.html_container">
+        <t t-if="is_multiple_label_in_paper">
+            <t t-set="padding_page" t-value="'padding: 14mm 3mm'"/>
+            <t t-set="rows" t-value="9"/>
+            <t t-set="columns" t-value="3"/>
+            <t t-foreach="range(page_numbers)" t-as="page">
+                <div class="o_label_sheet" t-att-style="padding_page">
+                    <table class="my-0 table table-sm table-borderless">
+                        <t t-foreach="range(rows)" t-as="row">
+                            <tr>
+                                <t t-foreach="range(columns)" t-as="column">
+                                    <t t-if="not current_quantity and quantity and not (current_data and current_data[1])">
+                                        <t t-set="current_data" t-value="quantity.popitem()"/>
+                                        <t t-set="product" t-value="current_data[0]"/>
+                                        <t t-set="barcode_and_qty" t-value="current_data[1].pop()"/>
+                                        <t t-set="barcode" t-value="barcode_and_qty[0]"/>
+                                        <t t-set="current_quantity" t-value="barcode_and_qty[1]"/>
+                                        <t t-set="cantidad" t-value="1"/>
+                                        <t t-set="has_line_type" t-value="has_type"/>
+                                        <!-- ubicacion/location -->
+                                        <t t-if="location_dest_by_product">
+                                            <t t-foreach="location_dest_by_product.items()" t-as="location_dest">
+                                                <t t-if="int(product.id) == int(location_dest[0])">
+                                                    <t t-foreach="location_dest[1]" t-as="location">
+                                                        <t t-set="ubicacion" t-value="location[1]"/>
+                                                        <t t-if="str(barcode) == str(location[0])">
+                                                            <t t-set="ubicacion" t-value="location[1]"/>
+                                                        </t>
+                                                    </t>
+                                                </t>
+                                            </t>
+                                        </t>
+
+                                        <!-- cantidad -->
+                                        <t t-if="line_qty_done_by_product and has_line_type">
+                                            <t t-foreach="line_qty_done_by_product.items()" t-as="qty_done">
+                                                <t t-if="int(product.id) == int(qty_done[0])">
+                                                    <t t-foreach="qty_done[1]" t-as="qty">
+                                                        <t t-set="cantidad" t-value="qty[1]"/>
+                                                    </t>
+                                                </t>
+                                            </t>
+                                        </t>
+                                    </t>
+                                    <t t-if="current_quantity">
+                                        <t t-set="make_invisible" t-value="False"/>
+                                        <t t-set="current_quantity" t-value="current_quantity - 1"/>
+                                    </t>
+                                    <t t-elif="current_data and current_data[1]">
+                                        <t t-set="barcode_and_qty" t-value="current_data[1].pop()"/>
+                                        <t t-set="barcode" t-value="barcode_and_qty[0]"/>
+                                        <t t-set="current_quantity" t-value="barcode_and_qty[1] - 1"/>
+                                    </t>
+                                    <t t-else="">
+                                        <t t-set="make_invisible" t-value="True"/>
+                                    </t>
+                                    <t t-call="product_print_label_wadax.report_simple_label_2_5x5_multiple"/>
+                                </t>
+                            </tr>
+                        </t>
+                    </table>
+                </div>
+            </t>
+        </t>
+        <t t-if="not is_multiple_label_in_paper">
+            <t t-set="table_style" t-value="'width:50mm;height:25mm'"/>
+            <t t-foreach="quantity.items()" t-as="barcode_and_qty_by_product">
+                <t t-set="product" t-value="barcode_and_qty_by_product[0]"/>
+                <t t-foreach="barcode_and_qty_by_product[1]" t-as="barcode_and_qty">
+                    <t t-set="barcode" t-value="barcode_and_qty[0]"/>
+                    <t t-set="receipt_qty" t-value="barcode_and_qty[1]"/>
+                    <t t-set="cantidad" t-value="1"/>
+                    <t t-set="has_line_type" t-value="has_type"/>
+
+                    <!-- ubicacion/location -->
+                    <t t-if="location_dest_by_product">
+                        <t t-foreach="location_dest_by_product.items()" t-as="location_dest">
+                            <t t-if="int(product.id) == int(location_dest[0])">
+                                <t t-foreach="location_dest[1]" t-as="location">
+                                    <t t-set="ubicacion" t-value="location[1]"/>
+                                    <t t-if="str(barcode) == str(location[0])">
+                                        <t t-set="ubicacion" t-value="location[1]"/>
+                                    </t>
+                                </t>
+                            </t>
+                        </t>
+                    </t>
+
+                    <!-- cantidad -->
+                    <t t-if="line_qty_done_by_product and has_line_type">
+                        <t t-foreach="line_qty_done_by_product.items()" t-as="qty_done">
+                            <t t-if="int(product.id) == int(qty_done[0])">
+                                <t t-foreach="qty_done[1]" t-as="qty">
+                                    <t t-set="cantidad" t-value="qty[1]"/>
+                                </t>
+                            </t>
+                        </t>
+                    </t>
+
+                    <t t-foreach="range(barcode_and_qty[1])" t-as="qty">
+                        <t t-call="product_print_label_wadax.report_simple_label_2_5x5"/>
+                    </t>
+                </t>
+            </t>
+        </t>
+    </t>
+</template>
+
+</odoo>
