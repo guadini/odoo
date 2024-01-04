@@ -118,7 +118,6 @@ class ProductLabelLayout(models.TransientModel):
             data['custom_barcodes'] = custom_barcodes
             data['location_dest_by_product'] = location_destination
             data['line_qty_done_by_product'] = line_qty_done
-            data['location_destination_temp'] = line.picking_id.location_dest_id.display_name
         return xml_id, data
 
     @api.onchange('print_format')
